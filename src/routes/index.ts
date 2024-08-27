@@ -1,8 +1,11 @@
 import { Router } from "express";
-import userRoutes from "./userRoutes.ts";
+import { verifyToken } from "../middleware/authMiddleware.ts";
+import { privateUserRouter, publicUserRouter } from "./userRoutes.ts";
 
 const router = Router();
 
-router.use("/user", userRoutes);
+//User routes
+router.use("/user", publicUserRouter);
+router.use("/user", verifyToken, privateUserRouter);
 
 export default router;

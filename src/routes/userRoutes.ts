@@ -1,10 +1,20 @@
-import { Router } from 'express';
-import { getUser, createUser, updateUser } from '../controllers/userController.ts';
+import { Router } from "express";
+import {
+  getUser,
+  createUser,
+  updateUser,
+  register,
+  login,
+} from "../controllers/userController.ts";
 
-const router = Router();
+export const publicUserRouter = Router();
+export const privateUserRouter = Router();
 
-router.get('/', getUser);
-router.post('/', createUser);
-router.put('/:id', updateUser);
+// Public routes
+publicUserRouter.get("/", getUser);
+publicUserRouter.post("/", createUser);
+publicUserRouter.post("/login", login);
+publicUserRouter.post("/register", register);
 
-export default router;
+// Secure route for updating a user
+privateUserRouter.put("/:id", updateUser);
