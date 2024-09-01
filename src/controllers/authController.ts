@@ -3,6 +3,11 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import connection from "../config/dbconfig.ts";
 import { FieldPacket } from "mysql2";
+import {
+  findUserByEmailQuery,
+  insertOrUpdateTokenQuery,
+  insertUserQuery,
+} from "../queries/userQueries.ts";
 
 // Register
 export const register = async (req: Request, res: Response) => {
@@ -14,13 +19,8 @@ export const register = async (req: Request, res: Response) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const query = `
-      INSERT INTO Users (username, email, password, firstName, lastName)
-      VALUES (?, ?, ?, ?, ?)
-    `;
-
   try {
-    await connection.query(query, [
+    await connection.query(insertUserQuery, [
       username,
       email,
       hashedPassword,
@@ -43,14 +43,11 @@ export const login = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "All fields should be filled in" });
   }
 
-  const query = `
-      SELECT * FROM Users WHERE email = ?
-    `;
-
   try {
-    const [rows]: [Array<any>, FieldPacket[]] = await connection.query(query, [
-      email,
-    ]);
+    const [rows]: [Array<any>, FieldPacket[]] = await connection.query(
+      findUserByEmailQuery,
+      [email]
+    );
 
     if (Array.isArray(rows) && rows.length === 0) {
       return res
@@ -83,16 +80,7 @@ export const login = async (req: Request, res: Response) => {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
-    const insertTokenQuery = `
-            INSERT INTO Tokens (userId, accessToken, refreshToken, expiresAt)
-            VALUES (?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE
-              accessToken = VALUES(accessToken),
-              refreshToken = VALUES(refreshToken),
-              expiresAt = VALUES(expiresAt)
-          `;
-
-    await connection.query(insertTokenQuery, [
+    await connection.query(insertOrUpdateTokenQuery, [
       user.id,
       accessToken,
       refreshToken,

@@ -18,3 +18,11 @@ export const insertOrUpdateTokenQuery = `
     refreshToken = VALUES(refreshToken),
     expiresAt = VALUES(expiresAt)
 `;
+
+// Query for updating User
+export const updateUserQuery = `
+    UPDATE Users
+    SET firstName = COALESCE(?, firstName),
+        lastName = COALESCE(?, lastName)
+     WHERE id = ?
+`;

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import connection from "../config/dbconfig.ts";
 import { ResultSetHeader } from "mysql2";
+import { updateUserQuery } from "../queries/userQueries.ts";
 
 export const getUser = (req: Request, res: Response) => {
   res.send("GET request to /user");
@@ -12,7 +13,6 @@ export const createUser = (req: Request, res: Response) => {
   res.send(`User created: ${JSON.stringify(user)}`);
 };
 
-
 // Edit user
 export const updateUser = async (req: any, res: Response) => {
   const userId = req.user.id;
@@ -23,14 +23,7 @@ export const updateUser = async (req: any, res: Response) => {
   }
 
   try {
-    const updateQuery = `
-      UPDATE Users
-      SET firstName = COALESCE(?, firstName),
-          lastName = COALESCE(?, lastName)
-      WHERE id = ?
-    `;
-
-    const [rows] = await connection.query<ResultSetHeader>(updateQuery, [
+    const [rows] = await connection.query<ResultSetHeader>(updateUserQuery, [
       firstName,
       lastName,
       userId,
