@@ -1,4 +1,4 @@
-import { createConnection } from "mysql2";
+import { createConnection } from "mysql2/promise";
 
 const dbConfig = {
   host: "localhost",
@@ -7,6 +7,6 @@ const dbConfig = {
   database: "Chatapp",
 };
 
-const connection = createConnection(dbConfig);
+const connection = await createConnection(dbConfig);
 
 export default connection;
