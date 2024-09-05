@@ -8,7 +8,7 @@ import {
 
 const privateChatRouter = Router();
 
-privateChatRouter.post("/create", createChat);
+privateChatRouter.post("", createChat);
 privateChatRouter.delete("/:chatId", deleteChat);
 privateChatRouter.put("/:chatId", editChat);
 privateChatRouter.post("/invite", inviteUserToChat);

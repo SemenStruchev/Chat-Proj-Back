@@ -1,76 +1,71 @@
-import { Request, Response } from 'express';
-import connection from '../config/dbconfig';
-import logger from '../config/logger';
-import { createChatQuery, deleteChatQuery, updateChatQuery, inviteUserQuery } from '../queries/chatQueries';
+import { Request, Response } from "express";
+import logger from "../config/logger.ts";
+import * as chatService from "../services/chatService.ts";
+import { asyncHandler } from "../middleware/errorHandler.ts";
 
 // Create a new chat
-export const createChat = async (req: Request, res: Response) => {
-  const { title, creatorId } = req.body;
+export const createChat = asyncHandler(async (req: any, res: Response) => {
+  const userId = req.user.id;
+  const { title } = req.body;
 
-  if (!title || !creatorId) {
+  if (!title || !userId) {
     logger.warn("Title and creator ID are required for creating a chat.");
-    return res.status(400).json({ message: "Title and creator ID are required." });
+    throw { message: "Title and creator ID are required.", statusCode: 400 };
   }
 
-  try {
-    await connection.query(createChatQuery, [title, creatorId]);
-    logger.info("Chat created successfully.");
-    res.status(201).json({ message: "Chat created successfully." });
-  } catch (err) {
-    logger.error("Error creating chat: ", err);
-    res.status(500).json({ message: "Server error." });
-  }
-};
+  await chatService.createChat(title, userId);
+  res.status(201).json({
+    success: true,
+    code: 201,
+    data: { message: "Chat created successfully." },
+  });
+});
 
 // Delete a chat
-export const deleteChat = async (req: Request, res: Response) => {
+export const deleteChat = asyncHandler(async (req: Request, res: Response) => {
   const { chatId } = req.params;
 
-  try {
-    await connection.query(deleteChatQuery, [chatId]);
-    logger.info(`Chat with ID ${chatId} deleted successfully.`);
-    res.status(200).json({ message: "Chat deleted successfully." });
-  } catch (err) {
-    logger.error("Error deleting chat: ", err);
-    res.status(500).json({ message: "Server error." });
-  }
-};
+  await chatService.deleteChat(Number(chatId));
+  res.status(200).json({
+    success: true,
+    code: 200,
+    data: { message: "Chat deleted successfully." },
+  });
+});
 
 // Edit a chat
-export const editChat = async (req: Request, res: Response) => {
+export const editChat = asyncHandler(async (req: Request, res: Response) => {
   const { chatId } = req.params;
   const { title } = req.body;
 
   if (!title) {
     logger.warn("New chat title is required.");
-    return res.status(400).json({ message: "New chat title is required." });
+    throw { message: "New chat title is required.", statusCode: 400 };
   }
 
-  try {
-    await connection.query(updateChatQuery, [title, chatId]);
-    logger.info(`Chat with ID ${chatId} updated successfully.`);
-    res.status(200).json({ message: "Chat updated successfully." });
-  } catch (err) {
-    logger.error("Error updating chat: ", err);
-    res.status(500).json({ message: "Server error." });
-  }
-};
+  await chatService.editChat(Number(chatId), title);
+  res.status(200).json({
+    success: true,
+    code: 200,
+    data: { message: "Chat updated successfully." },
+  });
+});
 
 // Invite a user to chat
-export const inviteUserToChat = async (req: Request, res: Response) => {
-  const { chatId, userId } = req.body;
+export const inviteUserToChat = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { chatId, userId } = req.body;
 
-  if (!chatId || !userId) {
-    logger.warn("Chat ID and user ID are required to invite a user.");
-    return res.status(400).json({ message: "Chat ID and user ID are required." });
-  }
+    if (!chatId || !userId) {
+      logger.warn("Chat ID and user ID are required to invite a user.");
+      throw { message: "Chat ID and user ID are required.", statusCode: 400 };
+    }
 
-  try {
-    await connection.query(inviteUserQuery, [chatId, userId]);
-    logger.info(`User with ID ${userId} invited to chat with ID ${chatId}.`);
-    res.status(200).json({ message: "User invited to chat successfully." });
-  } catch (err) {
-    logger.error("Error inviting user to chat: ", err);
-    res.status(500).json({ message: "Server error." });
+    await chatService.inviteUserToChat(Number(chatId), Number(userId));
+    res.status(200).json({
+      success: true,
+      code: 200,
+      data: { message: "User invited to chat successfully." },
+    });
   }
-};
+);
