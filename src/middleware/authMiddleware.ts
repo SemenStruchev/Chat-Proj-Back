@@ -1,9 +1,12 @@
+import dotenv from "dotenv";
 import { Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import connection from "../config/dbconfig.ts";
 
-const JWT_SECRET = "jwt_secret";
-const REFRESH_TOKEN_SECRET = "refresh_token_secret";
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET || "";
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "";
 
 export const verifyToken = async (
   req: any,
