@@ -69,3 +69,19 @@ export const inviteUserToChat = asyncHandler(
     });
   }
 );
+
+export const getUsersChats = asyncHandler(async (req: any, res: Response) => {
+  const userId = req.user.id;
+
+  if (!userId) {
+    logger.warn("User ID is required to fetch chats.");
+    throw { message: "User ID is required.", statusCode: 400 };
+  }
+
+  const chats = await chatService.getUsersChats(userId);
+  res.status(200).json({
+    success: true,
+    code: 200,
+    data: { chats },
+  });
+});
