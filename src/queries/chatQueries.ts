@@ -19,3 +19,10 @@ export const inviteUserQuery = `
   INSERT INTO UsersChats (chatId, userId)
   VALUES (?, ?);
 `;
+// Query to get a user chats
+export const getUserChatsQuery = `
+  SELECT c.*
+  FROM Chats c
+  INNER JOIN UsersChats uc ON c.id = uc.chatId
+  WHERE uc.userId = ?
+`;

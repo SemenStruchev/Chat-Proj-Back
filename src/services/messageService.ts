@@ -30,7 +30,7 @@ export const createMessage = async (
 };
 
 export const getMessageById = async (id: number) => {
-  const [rows] = await connection.query(getMessageByIdQuery, [id]);
+  const [rows]: any = await connection.query(getMessageByIdQuery, [id]);
   return rows[0];
 };
 
@@ -60,11 +60,10 @@ export const getMessagesByChatId = async (
     offset,
   ]);
 
-  const [[{ total }]] = await connection.query(countMessagesByChatIdQuery, [
-    chatId,
-    searchTerm,
-    searchTerm,
-  ]);
+  const [[{ total }]]: any = await connection.query(
+    countMessagesByChatIdQuery,
+    [chatId, searchTerm, searchTerm]
+  );
 
   return { messages, total };
 };
@@ -75,7 +74,7 @@ export const forwardMessage = async (
   forwarderId: number
 ) => {
   try {
-    const [result] = await connection.query(forwardMessageQuery, [
+    const [result]: any = await connection.query(forwardMessageQuery, [
       targetChatId,
       forwarderId,
       messageId,

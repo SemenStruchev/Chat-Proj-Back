@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import logger from "../config/logger";
+import logger from "../config/logger.ts";
 import * as messageService from "../services/messageService.ts";
 
 export const createMessage = async (req: Request, res: Response) => {
@@ -72,7 +72,11 @@ export const updateMessage = async (req: Request, res: Response) => {
   }
 
   try {
-    const result = await messageService.updateMessage(Number(messageId), text);
+    const result: any = await messageService.updateMessage(
+      Number(messageId),
+      text
+    );
+
     if (result.affectedRows === 0) {
       return res
         .status(404)
@@ -96,7 +100,7 @@ export const deleteMessage = async (req: Request, res: Response) => {
   const { messageId } = req.params;
 
   try {
-    const result = await messageService.deleteMessage(Number(messageId));
+    const result: any = await messageService.deleteMessage(Number(messageId));
     if (result.affectedRows === 0) {
       return res
         .status(404)
@@ -126,7 +130,7 @@ export const getMessagesByChatId = async (req: Request, res: Response) => {
   try {
     const { messages, total } = await messageService.getMessagesByChatId(
       Number(chatId),
-      search,
+      search as string,
       limitNumber,
       offset
     );
@@ -155,33 +159,33 @@ export const getMessagesByChatId = async (req: Request, res: Response) => {
 };
 
 export const forwardMessage = async (req: Request, res: Response) => {
-    const { messageId, targetChatId, forwarderId } = req.body;
-  
-    if (!messageId || !targetChatId || !forwarderId) {
-      logger.warn("Message ID, target chat ID, and forwarder ID are required.");
-      return res.status(400).json({
-        success: false,
-        code: 400,
-        message: "Message ID, target chat ID, and forwarder ID are required.",
-      });
-    }
-  
-    try {
-      const result = await messageService.forwardMessage(
-        messageId,
-        targetChatId,
-        forwarderId
-      );
-      res.status(200).json({
-        success: true,
-        code: 200,
-        message: "Message forwarded successfully.",
-        data: result,
-      });
-    } catch (err) {
-      logger.error("Error forwarding message: ", err);
-      res
-        .status(500)
-        .json({ success: false, code: 500, message: "Server error." });
-    }
-  };
+  const { messageId, targetChatId, forwarderId } = req.body;
+
+  if (!messageId || !targetChatId || !forwarderId) {
+    logger.warn("Message ID, target chat ID, and forwarder ID are required.");
+    return res.status(400).json({
+      success: false,
+      code: 400,
+      message: "Message ID, target chat ID, and forwarder ID are required.",
+    });
+  }
+
+  try {
+    const result = await messageService.forwardMessage(
+      messageId,
+      targetChatId,
+      forwarderId
+    );
+    res.status(200).json({
+      success: true,
+      code: 200,
+      message: "Message forwarded successfully.",
+      data: result,
+    });
+  } catch (err) {
+    logger.error("Error forwarding message: ", err);
+    res
+      .status(500)
+      .json({ success: false, code: 500, message: "Server error." });
+  }
+};

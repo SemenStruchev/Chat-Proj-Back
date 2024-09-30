@@ -4,6 +4,7 @@ import {
   deleteChatQuery,
   updateChatQuery,
   inviteUserQuery,
+  getUserChatsQuery,
 } from "../queries/chatQueries.ts";
 import logger from "../config/logger.ts";
 
@@ -34,4 +35,9 @@ export const inviteUserToChat = async (
 ): Promise<void> => {
   await connection.query(inviteUserQuery, [chatId, userId]);
   logger.info(`User with ID ${userId} invited to chat with ID ${chatId}.`);
+};
+
+export const getUsersChats = async (userId: number) => {
+  const [chats] = await connection.query(getUserChatsQuery, [userId]);
+  return chats;
 };
