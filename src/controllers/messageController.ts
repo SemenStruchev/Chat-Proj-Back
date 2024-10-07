@@ -2,15 +2,16 @@ import { Request, Response } from "express";
 import logger from "../config/logger.ts";
 import * as messageService from "../services/messageService.ts";
 
-export const createMessage = async (req: Request, res: Response) => {
+export const createMessage = async (req: any, res: Response) => {
   const {
     text,
     chatId,
-    creatorId,
     repliedMessageId,
     forwardedChatId,
     forwardedFromUserId,
   } = req.body;
+
+  const creatorId = req.user.id;
 
   if (!text || !chatId || !creatorId) {
     logger.warn(
@@ -51,6 +52,7 @@ export const getMessageById = async (req: Request, res: Response) => {
         .status(404)
         .json({ success: false, code: 404, message: "Message not found." });
     }
+
     res.status(200).json({ success: true, code: 200, data: message });
   } catch (err) {
     logger.error("Error retrieving message: ", err);

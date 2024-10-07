@@ -4,7 +4,10 @@ import helmetConfig from "./config/helmet.ts";
 import corsConfig from "./config/cors.ts";
 import { PORT } from "./config/default.ts";
 import logger from "./config/logger.ts";
-import { errorHandler } from "./middleware/errorHandler.ts";
+import {
+  errorHandler,
+  successResponseHandler,
+} from "./middleware/errorHandler.ts";
 
 const app = express();
 
@@ -12,8 +15,13 @@ app.use(helmetConfig);
 app.use(corsConfig);
 
 app.use(express.json());
+
+app.use(successResponseHandler);
+
 app.use("/api", router);
 
 app.use(errorHandler);
+
+export default app;
 
 app.listen(PORT, () => logger.info(`Server is running on port ${PORT}`));

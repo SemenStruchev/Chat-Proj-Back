@@ -16,7 +16,7 @@ export const createUser = (req: Request, res: Response) => {
 
 // Edit user
 export const updateUser = asyncHandler(async (req: any, res: Response) => {
-  const userId = req.user.id;
+  const userId = req?.user?.id ?? "";
   const { firstName, lastName } = req.body;
 
   if (!firstName || !lastName) {

@@ -5,6 +5,7 @@ import {
   updateChatQuery,
   inviteUserQuery,
   getUserChatsQuery,
+  countUserChatsQuery,
 } from "../queries/chatQueries.ts";
 import logger from "../config/logger.ts";
 
@@ -37,7 +38,27 @@ export const inviteUserToChat = async (
   logger.info(`User with ID ${userId} invited to chat with ID ${chatId}.`);
 };
 
-export const getUsersChats = async (userId: number) => {
-  const [chats] = await connection.query(getUserChatsQuery, [userId]);
-  return chats;
+export const getUsersChats = async (
+  userId: number,
+  search: string,
+  sort: string,
+  order: string,
+  limit: number,
+  offset: number
+) => {
+  const searchQuery = `%${search}%`; // To perform a partial match for search
+
+  const [chats] = await connection.query(getUserChatsQuery, [
+    userId,
+    searchQuery,
+    limit,
+    offset,
+  ]);
+
+  const [[{ total }]]: any = await connection.query(countUserChatsQuery, [
+    userId,
+    searchQuery,
+  ]);
+
+  return { chats, total };
 };

@@ -13,7 +13,8 @@ export const createChat = asyncHandler(async (req: any, res: Response) => {
     throw { message: "Title and creator ID are required.", statusCode: 400 };
   }
 
-  await chatService.createChat(title, userId);
+  const chat = await chatService.createChat(title, userId);
+
   res.status(201).json({
     success: true,
     code: 201,
@@ -26,6 +27,7 @@ export const deleteChat = asyncHandler(async (req: Request, res: Response) => {
   const { chatId } = req.params;
 
   await chatService.deleteChat(Number(chatId));
+
   res.status(200).json({
     success: true,
     code: 200,
@@ -44,6 +46,7 @@ export const editChat = asyncHandler(async (req: Request, res: Response) => {
   }
 
   await chatService.editChat(Number(chatId), title);
+
   res.status(200).json({
     success: true,
     code: 200,
@@ -62,6 +65,7 @@ export const inviteUserToChat = asyncHandler(
     }
 
     await chatService.inviteUserToChat(Number(chatId), Number(userId));
+
     res.status(200).json({
       success: true,
       code: 200,
@@ -72,16 +76,45 @@ export const inviteUserToChat = asyncHandler(
 
 export const getUsersChats = asyncHandler(async (req: any, res: Response) => {
   const userId = req.user.id;
+  const {
+    page = 1,
+    limit = 10,
+    search = "",
+    sort = "createdAt",
+    order = "desc",
+  } = req.query;
 
   if (!userId) {
     logger.warn("User ID is required to fetch chats.");
     throw { message: "User ID is required.", statusCode: 400 };
   }
 
-  const chats = await chatService.getUsersChats(userId);
+  const pageNumber = Math.max(Number(page), 1);
+  const limitNumber = Math.max(Number(limit), 1);
+  const offset = (pageNumber - 1) * limitNumber;
+
+  const { chats, total } = await chatService.getUsersChats(
+    userId,
+    search,
+    sort,
+    order,
+    limitNumber,
+    offset
+  );
+
+  const totalPages = Math.ceil(total / limitNumber);
+
   res.status(200).json({
     success: true,
     code: 200,
-    data: { chats },
+    data: {
+      chats,
+      pagination: {
+        total,
+        totalPages,
+        currentPage: pageNumber,
+        limit: limitNumber,
+      },
+    },
   });
 });

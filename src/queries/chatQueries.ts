@@ -24,5 +24,16 @@ export const getUserChatsQuery = `
   SELECT c.*
   FROM Chats c
   INNER JOIN UsersChats uc ON c.id = uc.chatId
-  WHERE uc.userId = ?
+  WHERE uc.userId = ? 
+  AND c.title LIKE ? 
+  ORDER BY ?? ??
+  LIMIT ? OFFSET ?
+`;
+
+export const countUserChatsQuery = `
+  SELECT COUNT(*) AS total
+  FROM Chats c
+  INNER JOIN UsersChats uc ON c.id = uc.chatId
+  WHERE uc.userId = ? 
+  AND c.title LIKE ?
 `;
