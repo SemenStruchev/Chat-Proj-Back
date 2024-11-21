@@ -4,6 +4,7 @@ import { publicUserRouter } from "./userRoutes/public.ts";
 import { privateUserRouter } from "./userRoutes/private.ts";
 import { publicAuthRouter } from "./authRoutes/public.ts";
 import privateChatRouter from "./chatRoutes/private.ts";
+import privateMessagesRouter from "./messageRoutes/private.ts";
 
 const router = Router();
 
@@ -16,5 +17,8 @@ router.use("/user", verifyToken, privateUserRouter);
 
 //Chat routes
 router.use("/chat", verifyToken, privateChatRouter);
+
+//Chat routes
+router.use("/messages", verifyToken, privateMessagesRouter);
 
 export default router;

@@ -8,6 +8,12 @@ import {
   insertOrUpdateTokenQuery,
   insertUserQuery,
 } from "../queries/userQueries.ts";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET || "";
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "";
 
 // Register
 export const register = async (req: Request, res: Response) => {
@@ -67,13 +73,13 @@ export const login = async (req: Request, res: Response) => {
 
     const accessToken = jwt.sign(
       { id: user.id, email: user.email },
-      "your_jwt_secret",
+      JWT_SECRET,
       { expiresIn: "1h" }
     );
 
     const refreshToken = jwt.sign(
       { id: user.id, email: user.email },
-      "your_refresh_token_secret",
+      REFRESH_TOKEN_SECRET,
       { expiresIn: "7d" }
     );
 

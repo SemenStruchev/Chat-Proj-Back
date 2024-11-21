@@ -3,7 +3,7 @@ import { ResultSetHeader } from "mysql2";
 import { updateUserQuery } from "../queries/userQueries.ts";
 
 export const updateUser = async (
-  userId: number,
+  userId: string | number,
   firstName: string,
   lastName: string
 ): Promise<void> => {

@@ -14,7 +14,7 @@ export const verifyToken = async (
   next: NextFunction
 ) => {
   const authorizationHeader = req.headers["authorization"];
-  const refreshToken = req.headers["x-refresh-token"] as string;
+  const refreshToken = req.headers["authorizationx-refresh-token"] as string;
   let token = authorizationHeader?.split(" ")[1];
 
   if (!token) {
